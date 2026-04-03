@@ -7,7 +7,7 @@ short sampleBuffer[256];
 volatile int samplesRead;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(1000000);
   while(!Serial);
   pinMode(EXTERNAL_PDM_CLK, OUTPUT);
   pinMode(EXTERNAL_PDM_DATA, INPUT);
