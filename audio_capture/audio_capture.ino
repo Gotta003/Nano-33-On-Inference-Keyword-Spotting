@@ -1,43 +1,47 @@
 #include <PDM.h>
 
-#define EXTERNAL_PDM_CLK D2 //P1.11
-#define EXTERNAL_PDM_DATA D3 //P1.12
-
-short sampleBuffer[256];
-volatile int samplesRead;
+static short sampleBuffer[512];
+volatile int samplesRead = 0;
+volatile int discardCount=0;
 
 void setup() {
-  Serial.begin(1000000);
-  while(!Serial);
-  pinMode(EXTERNAL_PDM_CLK, OUTPUT);
-  pinMode(EXTERNAL_PDM_DATA, INPUT);
+  Serial.begin(9600);
+  while (!Serial);
+
   PDM.onReceive(onPDMdata);
-  if(!PDM.begin(1, 16000)) {
+  PDM.setBufferSize(512);
+  if(!PDM.begin(1,16000)) {
     Serial.println("Failed to start PDM!");
     while(1);
   }
   NRF_PDM->ENABLE=0;
-  NRF_PDM->PSEL.CLK=digitalPinToPinName(EXTERNAL_PDM_CLK);
-  NRF_PDM->PSEL.DIN=digitalPinToPinName(EXTERNAL_PDM_DATA);
+  NRF_PDM->PSEL.CLK=43;
+  NRF_PDM->PSEL.DIN=44;
+  NRF_PDM->MODE=0x02;
   NRF_PDM->ENABLE=1;
   NRF_PDM->TASKS_START=1;
+  PDM.setGain(0); // Start with some gain
  
-  PDM.setGain(40);
-  Serial.println("External PDM Mic Initialized");
+  delay(500);
+  Serial.println("PDM Started");
 }
 
 void loop() {
-  if(samplesRead>0) {
-    Serial.print(sampleBuffer[0]);
-    Serial.print(" ");
-    samplesRead=0;
+  if (samplesRead > 0) {
+    for (int i = 0; i < samplesRead; i++) {
+      Serial.print(sampleBuffer[i]);
+      Serial.print(" ");
+    }
+    samplesRead = 0;
   }
 }
 
 void onPDMdata() {
-  int bytesAvailable=PDM.available();
-  if(bytesAvailable>0) {
-    PDM.read(sampleBuffer, bytesAvailable);
-    samplesRead=bytesAvailable/2;
+  int bytesAvailable = PDM.available();
+  PDM.read(sampleBuffer, bytesAvailable);
+  if(discardCount<50) {
+    discardCount++;
+    return;
   }
+  samplesRead = bytesAvailable / 2;
 }
