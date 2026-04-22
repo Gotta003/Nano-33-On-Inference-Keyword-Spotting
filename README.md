@@ -114,4 +114,50 @@ pwd
 
 ## Hardware Setup
 
-![[hardware_setup.png]]
+<table align="center">
+  <tr>
+    <td>
+      <img src="hardware_setup.png" alt="Board configuration" width="400">
+    </td>
+  </tr>
+</table>
+
+The physical connections are composed as followed:
+<table align="center">
+    <tr>
+        <td>Color</td>
+        <td>Pin Nano 33 BLE</td>
+        <td>Functionally</td>
+        <td>Note</td>
+    </tr>
+    <tr>
+        <td>Red</td>
+        <td>+3V3</td>
+        <td>Voltage of 3.3 V</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>Light Blue</td>
+        <td>GND</td>
+        <td>Ground</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>Orange</td>
+        <td>+3V3</td>
+        <td>Selector</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>Dark Green</td>
+        <td>P1.11</td>
+        <td>Clock</td>
+        <td>To have a clear signal if there is too much noise, insert between BLE 33 and the Mic a 100 Ohm Resistor</td>
+    </tr>
+    <tr>
+        <td>Purple</td>
+        <td>P1.12</td>
+        <td>Data Transfer</td>
+        <td>-</td>
+    </tr>
+</table>
