@@ -161,3 +161,70 @@ The physical connections are composed as followed:
         <td>-</td>
     </tr>
 </table>
+The pins are not setup by default, so we have to manually modify the parameter related to those, so you need to go to "~/.arduino15/packages/arduino/hardware/mbed_nano/4.5.0/variants/ARDUINO_NANO33BLE/variants.cpp", going under PWM and change the default pins for Arduino Nano 33 BLE Sense to P1_11 for PDM CLK and P1_12 for PDM DIN.
+
+[Go to Table of Contents](#table-of-contents)
+
+---
+
+# Project Running
+
+## Data Acquisition
+If all the setup was performed, open a new shetch in "File > Open..." and select audio_capture, since we have to check that all is ready and the pins of the microphone are correctly configured. Before you inference the code press "Ctrl + Shift + M", this will open the Serial Monitor that will enable to see the output. During the execution if you see any fluctuation in correspondence to the voice that means that it works.
+
+## Feature Extraction and Training
+The audio capturing will be done by the user with a simple typing of the class and after pressing enter the sound will be registered and the samples will be saved in the corresponding folder. Note that the audio is not reproducible from the file, since it is not .wav encoded, but a fast way to save that to be parsed into the feature extraction logic. 
+
+In the training cell, the code will then divide the dataset for each single .csv taking 70% for training, 15% for validation and 15% for testing. Considering that the code will need the MEAN and STD deviation of the signal and on inference that is not possible the output of the file should be copy and pasted on .ino file in deployment folder.
+
+After this  there is the training phase and to demonstrate the correctness of the model, in the repository there is the confusion matrix (confusion_matrix.png). The model is saved in "sound_model.tflite". 
+The structure of the model is the following:
+```
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ conv2d_6 (Conv2D)               │ (None, 13, 32, 8)      │            80 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_6           │ (None, 13, 32, 8)      │            32 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d_6 (MaxPooling2D)  │ (None, 6, 16, 8)       │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_7 (Dropout)             │ (None, 6, 16, 8)       │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ conv2d_7 (Conv2D)               │ (None, 6, 16, 16)      │         1,168 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_7           │ (None, 6, 16, 16)      │            64 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ max_pooling2d_7 (MaxPooling2D)  │ (None, 3, 8, 16)       │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_8 (Dropout)             │ (None, 3, 8, 16)       │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ flatten_3 (Flatten)             │ (None, 384)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_3 (Dense)                 │ (None, 32)             │        12,320 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_9 (Dropout)             │ (None, 32)             │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_4 (Dense)                 │ (None, 4)              │           132 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+```
+
+When exporting the model.h using the code or the xxd, remember to move that header to the folder deployment in order to be included in the final sketch.
+
+## Deployment
+If you insert new classes, you have to modify the array "char* class_names[]", since these are labels and if you performed a new training, copy and paste from the notes "MFCC_MEAN" and "MFCC_STD" values. After this, the model will run on inference on the device and when performed a movement will appear a classification with the probability of being a specific movement. The data processing and feature extraction and normalization are done in "deployment" folder. The CMSIS enables to have less code and the totality occupied a total of 87% of the total memory, since it has to upload in it the real-time audio processing.
+
+[Go to Table of Contents](#table-of-contents)
+
+---
+
+# Contacts
+
+* Matteo Gottardelli
+Email: matteogottardelli@gmail.com
+
+[Go to Table of Contents](#table-of-contents)
+
+---
