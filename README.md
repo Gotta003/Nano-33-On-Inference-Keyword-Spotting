@@ -1,5 +1,5 @@
 # Nano-33-On-Inference-Keyword-Spotting
-AI scalable Embedded application that recognizes gestures using an Arduino Nano 33 BLE with an external Omnidirectional Microphone Module MEMS Digital PDM. The code should work for Arduino Nano 33 BLE Sense, too, however the data given in input since they were sampled via this external module can be slightly different, leading to inaccuracy. It contains 1MB Flash CPU, For complete datasheet, pinout and schematics, check out this url: [Arduino Nano 33 BLE](https://docs.arduino.cc/hardware/nano-33-ble/).
+AI scalable Embedded application that recognizes 1-sec audio samples using an Arduino Nano 33 BLE with an external Omnidirectional Microphone Module MEMS Digital PDM. The code should work for Arduino Nano 33 BLE Sense, too, however the data given in input since they were sampled via this external module can be slightly different, leading to inaccuracy. It contains 1MB Flash CPU, For complete datasheet, pinout and schematics, check out this url: [Arduino Nano 33 BLE](https://docs.arduino.cc/hardware/nano-33-ble/).
 
 The project was run on Linux Ubuntu 24.04 LTS with a machine with a dedicated NVIDIA GeForce RTX 5060, but the project can work using CPU too. The objective of the project was to recognize 4 classes (clap, tap, snap, silence [collapse class]) with a model that fits the device.
 
@@ -38,7 +38,7 @@ Nano-33-On-Inference-Keyword-Spotting
 |- setup.sh                 # Code for setup the virtual environment
 ```
 
-Note that those .wav files were not
+Note that those .wav files were not standard playable audio files but raw numerical data.
 [Go to Table of Contents](#table-of-contents)
 
 ---
@@ -56,7 +56,7 @@ Note that those .wav files were not
 ---
 
 # Setup
-After downloading these development IDE are the following and setuping the virtual environment for python running with local GPU, however this second part can be also done on Google Colab importing there .ipynb file.
+Follow these steps to configure the development environments and setting up the virtual environment for python running with local GPU, however this second part can be also done on Google Colab importing there .ipynb file.
 ## Visual Studio Code
 Download the following extensions in the Marketplace in the application:
 - Python
@@ -127,7 +127,7 @@ The physical connections are composed as followed:
     <tr>
         <td>Color</td>
         <td>Pin Nano 33 BLE</td>
-        <td>Functionally</td>
+        <td>Function</td>
         <td>Note</td>
     </tr>
     <tr>
@@ -151,17 +151,19 @@ The physical connections are composed as followed:
     <tr>
         <td>Dark Green</td>
         <td>P1.11</td>
-        <td>Clock</td>
-        <td>To have a clear signal if there is too much noise, insert between BLE 33 and the Mic a 100 Ohm Resistor</td>
+        <td>PDM Clock</td>
+        <td>Use 100 Ohm Resistor to reduce signal noise</td>
     </tr>
     <tr>
         <td>Purple</td>
         <td>P1.12</td>
-        <td>Data Transfer</td>
+        <td>PDM Data</td>
         <td>-</td>
     </tr>
 </table>
 The pins are not setup by default, so we have to manually modify the parameter related to those, so you need to go to "~/.arduino15/packages/arduino/hardware/mbed_nano/4.5.0/variants/ARDUINO_NANO33BLE/variants.cpp", going under PWM and change the default pins for Arduino Nano 33 BLE Sense to P1_11 for PDM CLK and P1_12 for PDM DIN.
+
+WARNING: Note that if the board core is updated that file with all the changes applied will be overwritten and it will affect all other projects using the board. Those pins are not used for any function, but be careful in which you are choosing.
 
 [Go to Table of Contents](#table-of-contents)
 
@@ -170,7 +172,7 @@ The pins are not setup by default, so we have to manually modify the parameter r
 # Project Running
 
 ## Data Acquisition
-If all the setup was performed, open a new shetch in "File > Open..." and select audio_capture, since we have to check that all is ready and the pins of the microphone are correctly configured. Before you inference the code press "Ctrl + Shift + M", this will open the Serial Monitor that will enable to see the output. During the execution if you see any fluctuation in correspondence to the voice that means that it works.
+If all the setup was performed, open a new sketch in "File > Open..." and select audio_capture, since we have to check that all is ready and the pins of the microphone are correctly configured. Before you run the code press "Ctrl + Shift + M", this will open the Serial Monitor that will enable to see the output. During the execution if you see any fluctuation in correspondence to the voice that means that it works.
 
 ## Feature Extraction and Training
 The audio capturing will be done by the user with a simple typing of the class and after pressing enter the sound will be registered and the samples will be saved in the corresponding folder. Note that the audio is not reproducible from the file, since it is not .wav encoded, but a fast way to save that to be parsed into the feature extraction logic. 
