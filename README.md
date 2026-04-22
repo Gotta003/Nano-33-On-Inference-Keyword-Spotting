@@ -213,10 +213,10 @@ The structure of the model is the following:
 └─────────────────────────────────┴────────────────────────┴───────────────┘
 ```
 
-When exporting the model.h using the code or the xxd, remember to move that header to the folder deployment in order to be included in the final sketch.
+When exporting the model.h using the code or the xxd, remember to move that header to the folder deployment in order to be included in the final sketch. The model with this achieves a 90% of accuracy being good enough for the deployment.
 
 ## Deployment
-If you insert new classes, you have to modify the array "char* class_names[]", since these are labels and if you performed a new training, copy and paste from the notes "MFCC_MEAN" and "MFCC_STD" values. After this, the model will run on inference on the device and when performed a movement will appear a classification with the probability of being a specific movement. The data processing and feature extraction and normalization are done in "deployment" folder. The CMSIS enables to have less code and the totality occupied a total of 87% of the total memory, since it has to upload in it the real-time audio processing.
+If you insert new classes, you have to modify the array "char* class_names[]", since these are labels and if you performed a new training, copy and paste from the notes "MFCC_MEAN" and "MFCC_STD" values. After this, the model will run on inference on the device and when performed a movement will appear a classification with the probability of being a specific movement. The data processing and feature extraction and normalization are done in "deployment" folder. The CMSIS enables to have less code and the totality occupied a total of 87% of the total memory, since it has to upload in it the real-time audio processing. The results are as expected coherent with a general easiness in finding clap, tap and silence, the only one that struggles is the snap, but that is due the quality of the input dataset recording.
 
 [Go to Table of Contents](#table-of-contents)
 
